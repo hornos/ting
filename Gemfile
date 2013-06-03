@@ -1,0 +1,12 @@
+source 'https://rubygems.org'
+
+gem 'pusher'
+gem 'pusher-client'
+gem 'msgpack'
+gem 'ruby-xz'
+gem 'Ascii85'
+gem 'gibberish'
+gem 'activesupport'
+gem 'gli'
+gem 'eat'
+gem 'sqlite3'
