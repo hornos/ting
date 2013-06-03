@@ -108,8 +108,8 @@ command :client do |cmd|
       begin
         cmd, data = decode(data)
       rescue Exception => e  
-        puts e.message
-        break
+        puts "Key error: #{e.message}"
+        next
       end
       case cmd
       when 'ping'
