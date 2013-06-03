@@ -105,7 +105,12 @@ command :client do |cmd|
     # Subscribe to two channels
     socket.subscribe(cfg[:channel])
     socket[cfg[:channel]].bind(cfg[:event]) do |data|
-      cmd, data = decode(data)
+      begin
+        cmd, data = decode(data)
+      rescue Exception => e  
+        puts e.message
+        break
+      end
       case cmd
       when 'ping'
         chan  = cfg[:channel]
