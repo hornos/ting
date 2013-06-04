@@ -107,32 +107,35 @@ command :client do |cmd|
     socket[cfg[:channel]].bind(cfg[:event]) do |data|
       begin
         cmd, data = decode(data)
+
+        case cmd
+        when 'ping'
+          chan  = cfg[:channel]
+          event = cfg[:event]
+          ip = global_options[:u] ? upnp() : eat('http://ifconfig.me/ip', :timeout => 60)
+          pong = {
+            :id => @config[:myid],
+            :ip => ip.strip,
+            :fp => sshfp()
+          }
+          Pusher[chan].trigger(event, encode(['pong',pong]))
+        when 'pong'
+          data.tap do |h|
+            h.keys.each { |k| h[k.to_sym] = h.delete(k) }
+          end
+          out = "#{global_options[:h]}/#{data[:id]}.json"
+          File.open(out,"w") do |f|
+            f.write(JSON.pretty_generate(data))
+          end
+          puts data
+        end # case cmd
+
       rescue Exception => e  
-        puts "Key error: #{e.message}"
+        puts "Exception: #{e.message}"
         next
       end
-      case cmd
-      when 'ping'
-        chan  = cfg[:channel]
-        event = cfg[:event]
-        ip = global_options[:u] ? upnp() : eat('http://ifconfig.me/ip', :timeout => 10)
-        pong = {
-          :id => @config[:myid],
-          :ip => ip.strip,
-          :fp => sshfp()
-        }
-        Pusher[chan].trigger(event, encode(['pong',pong]))
-      when 'pong'
-        data.tap do |h|
-          h.keys.each { |k| h[k.to_sym] = h.delete(k) }
-        end
-        out = "#{global_options[:h]}/#{data[:id]}.json"
-        File.open(out,"w") do |f|
-          f.write(JSON.pretty_generate(data))
-        end
-        puts data
-      end # when
-    end # data
+
+    end # socket do data
 
     socket.connect
   end
