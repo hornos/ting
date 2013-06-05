@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ### BEGIN INIT INFO
 # Provides: ting
 # Required-Start:    $remote_fs $syslog
@@ -9,10 +9,22 @@
 # Description:       Enable service provided by daemon.
 ### END INIT INFO
 
-. /etc/rc.d/init.d/functions
 
-### Ruby
-# . /etc/profile.d/rvm.sh
+# RedHat
+if test -r /etc/rc.d/init.d/functions ; then
+  source /etc/rc.d/init.d/functions
+fi
+
+# Debian & Ubuntu
+if test -r /lib/lsb/init-functions ; then
+  source /lib/lsb/init-functions
+  function echo_success() {
+    log_success_msg
+  }
+  function echo_failure() {
+    log_failure_msg
+  }
+fi
 
 USER="sysop"
 
