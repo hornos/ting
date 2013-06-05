@@ -128,10 +128,12 @@ command :client do |cmd|
             f.write(JSON.pretty_generate(data))
           end
           puts data
+          STDOUT.flush
         end # case cmd
 
       rescue Exception => e  
         puts "Exception: #{e.message}"
+        STDOUT.flush
         next
       end
 
@@ -162,6 +164,7 @@ end
 
 pre do |global,command,options,args|
   puts "Ting started"
+  STDOUT.flush
 
   # change to base directory
   Dir.chdir(File.dirname(__FILE__))
@@ -184,6 +187,7 @@ pre do |global,command,options,args|
     @externalip = upnp()
     die('UPNP failed') if @externalip.empty?
     puts "External IP: #{@externalip}"
+    STDOUT.flush
   end
 
   # init hosts
