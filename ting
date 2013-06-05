@@ -60,8 +60,8 @@ def upnp(pattern="ExternalIPAddress")
   end
 end
 
-def sshfp(type="rsa")
-  stdin, stdout, stderr = Open3.popen3("ssh-keygen -lf /etc/ssh/ssh_host_#{type}_key.pub")
+def sshfp(type=:rsa)
+  stdin, stdout, stderr = Open3.popen3("ssh-keygen -lf /etc/ssh/ssh_host_#{type.to_s}_key.pub")
   for line in stdout.readlines
     return line.split[1]
   end
@@ -116,7 +116,9 @@ command :client do |cmd|
           pong = {
             :id => @config[:myid],
             :ip => ip.strip,
-            :fp => sshfp()
+            :fp_rsa => sshfp(),
+            :fp_dsa => sshfp(:dsa),
+            :fp_ecdsa => sshfp(:ecdsa)          
           }
           Pusher[chan].trigger(event, encode(['pong',pong]))
         when 'pong'

@@ -1,5 +1,5 @@
-## Illuminati
-Illuminati is GPUPNP client. Each node is subscribed to a Puhser channel waiting for commands.
+## One Ting to rule them all
+Ting a pusher.com based GPUPNP. You can make Ting rings to circulate the inforamtion. Currently IP ans SSH fingerprint is pushed.
 
 Start the client:
 
@@ -9,8 +9,4 @@ Send a ping broadcast:
 
     ./ting ping
 
-List hosts:
-
-    ./hosts
-
-Open
+Hosts are found in `./hosts` directory as json files.
