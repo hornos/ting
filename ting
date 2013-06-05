@@ -161,6 +161,11 @@ command :genkey do |cmd|
 end
 
 pre do |global,command,options,args|
+  puts "Ting started"
+
+  # change to base directory
+  Dir.chdir(File.dirname(__FILE__))
+
   @config = YAML.load( ERB.new( File.read( global[:config] ) ).result )
   @config[:id] = global[:id] || command.name.to_s
   {:args=> args, :global=> global, :options=> options}.each { |k,v| @config[k] = v }
