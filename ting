@@ -90,6 +90,9 @@ switch [:u,:upnp]
 desc 'Use SQL'
 switch [:s,:sql]
 
+desc 'Monitor'
+switch [:m,:monitor]
+
 ### Commands
 desc 'Ting client'
 arg_name ''
@@ -110,6 +113,10 @@ command :client do |cmd|
 
         case cmd
         when 'ping'
+          # in monitor mode we dont ping
+          next if global_options[:m]
+
+          # pong
           chan  = cfg[:channel]
           event = cfg[:event]
           ip = global_options[:u] ? upnp() : eat('http://ifconfig.me/ip', :timeout => 60)
@@ -141,7 +148,14 @@ command :client do |cmd|
 
     end # socket do data
 
-    socket.connect
+    begin
+      socket.connect
+    rescue Exception => e  
+      puts "Exception: #{e.message}"
+      STDOUT.flush
+      sleep 5
+      retry
+    end
   end
 end
 
