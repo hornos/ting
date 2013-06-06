@@ -140,7 +140,8 @@ command :client do |cmd|
           STDOUT.flush
         end # case cmd
 
-      rescue Exception => e  
+      rescue Exception => e
+        exit if e.message == "SIGTERM"
         puts "Exception: #{e.message}"
         STDOUT.flush
         next
@@ -150,7 +151,8 @@ command :client do |cmd|
 
     begin
       socket.connect
-    rescue Exception => e  
+    rescue Exception => e
+      exit if e.message == "SIGTERM"
       puts "Exception: #{e.message}"
       STDOUT.flush
       sleep 5
