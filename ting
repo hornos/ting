@@ -16,6 +16,7 @@ include GLI::App
 program_desc 'The Ting Tings'
 version 1.0
 
+
 ### compress
 def msgpack(data,enc=:encode)
   return data.to_msgpack if enc == :encode
@@ -83,6 +84,11 @@ default_value "#{File.dirname(__FILE__)}/hosts"
 arg_name 'hosts'
 flag [:h,:hosts]
 
+desc 'Privileged user'
+default_value "sysop"
+arg_name 'privilege'
+flag [:p,:priv]
+
 ### Global switches
 desc 'Use UPNP'
 switch [:u,:upnp]
@@ -92,6 +98,17 @@ switch [:s,:sql]
 
 desc 'Monitor'
 switch [:m,:monitor]
+
+desc 'Daemon'
+switch [:d,:daemon]
+
+### Global variables
+@prog="#{File.basename(__FILE__)}"
+
+def msg(m="")
+  puts "[#{@prog}] #{m}"
+  STDOUT.flush
+end
 
 ### Commands
 desc 'Ting client'
@@ -125,7 +142,7 @@ command :client do |cmd|
             :ip => ip.strip,
             :fp_rsa => sshfp(),
             :fp_dsa => sshfp(:dsa),
-            :fp_ecdsa => sshfp(:ecdsa)          
+            :fp_ecdsa => sshfp(:ecdsa)
           }
           Pusher[chan].trigger(event, encode(['pong',pong]))
         when 'pong'
@@ -136,28 +153,19 @@ command :client do |cmd|
           File.open(out,"w") do |f|
             f.write(JSON.pretty_generate(data))
           end
-          puts data
-          STDOUT.flush
+          msg( data )
         end # case cmd
 
       rescue Exception => e
-        exit if e.message == "SIGTERM"
-        puts "Exception: #{e.message}"
-        STDOUT.flush
-        next
+        msg "socket bind Exception: #{e.message}"
+        sleep 3
+        retry
       end
 
     end # socket do data
 
-    begin
-      socket.connect
-    rescue Exception => e
-      exit if e.message == "SIGTERM"
-      puts "Exception: #{e.message}"
-      STDOUT.flush
-      sleep 5
-      retry
-    end
+    socket.connect
+
   end
 end
 
@@ -181,8 +189,6 @@ command :genkey do |cmd|
 end
 
 pre do |global,command,options,args|
-  puts "Ting started"
-  STDOUT.flush
 
   # change to base directory
   Dir.chdir(File.dirname(__FILE__))
@@ -192,6 +198,7 @@ pre do |global,command,options,args|
   {:args=> args, :global=> global, :options=> options}.each { |k,v| @config[k] = v }
   @config[:key] = File.read( global[:key] )
   @cipher = Gibberish::AES.new(@config[:key])
+  msg "Configuration loaded: #{global[:config]}"
 
   # init Pusher
   cfg = @config[:pusher]
@@ -199,18 +206,19 @@ pre do |global,command,options,args|
   Pusher.key    = cfg[:key]
   Pusher.secret = cfg[:secret]
   # Pusher.encrypted =
+  msg "Pusher initialized: #{cfg[:app_id]}"
 
   # UPNP discovery
   if global[:u]
     @externalip = upnp()
     die('UPNP failed') if @externalip.empty?
-    puts "External IP: #{@externalip}"
-    STDOUT.flush
+    msg "External UPNP IP: #{@externalip}"
   end
 
   # init hosts
   Dir.mkdir(global[:h]) unless File.exists?(global[:h])
 
+  msg "Ting ready"
   true
 end
 
@@ -221,7 +229,7 @@ end
 on_error do |exception|
   STDERR.puts exception.backtrace
   # require 'pry'
-  # binding.pry
+  # binding.pry
   true
 end
 
