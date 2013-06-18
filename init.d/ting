@@ -71,7 +71,9 @@ do_start()
                 status
                 if [ $? -eq 0  ] ; then 
                   echo_success
-                  touch $lockfile
+                  if test -d "/var/lock/subsys" ; then
+                    touch $lockfile
+                  fi
                 else
                   echo_failure
                 fi
