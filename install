@@ -1,3 +1,4 @@
 #!/bin/bash
 source /etc/profile.d/rvm.sh
+gem install bundler
 bundle install
