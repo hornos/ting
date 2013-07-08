@@ -149,7 +149,7 @@ command :client do |cmd|
           data.tap do |h|
             h.keys.each { |k| h[k.to_sym] = h.delete(k) }
           end
-          out = "#{global_options[:h]}/#{data[:id]}.json"
+          out = "#{global_options[:hosts]}/#{data[:id]}.json"
           File.open(out,"w") do |f|
             f.write(JSON.pretty_generate(data))
           end

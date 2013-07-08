@@ -60,9 +60,10 @@ function _status() {
 
 function start() {
   echo -n "Starting ${DAEMON} $SERVER: "
-  if [ ! -f "$PID_FILE" ] ; then
+  if [ -f "$PID_FILE" ] ; then
     echo "$SERVER is running"
     RETVAL=1
+    return
   fi
 
   cd ${ROOT_DIR}
