@@ -80,7 +80,6 @@ function start() {
   else
     echo_failure
   fi
-  echo
 }
 
 function stop() {
@@ -90,7 +89,6 @@ function stop() {
     pid=`cat "${PID_FILE}"`
     kill ${pid} > /dev/null 2>&1 && echo_success || echo_failure
   fi
-  echo
   sleep 2
   for i in ${PID_FILE} ${LOG_FILE} $lockfile ; do
     rm -f ${i}

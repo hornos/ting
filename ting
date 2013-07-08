@@ -159,7 +159,7 @@ command :client do |cmd|
       rescue Exception => e
         msg "socket bind Exception: #{e.message}"
         sleep 3
-        retry
+        # retry
       end
 
     end # socket do data
