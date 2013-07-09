@@ -86,8 +86,13 @@ flag [:hosts]
 
 desc 'Privileged user'
 default_value "sysop"
-arg_name 'privilege'
+arg_name 'user'
 flag [:user]
+
+desc 'Timeout'
+default_value 60
+arg_name 'timeout'
+flag [:timeout]
 
 ### Global switches
 desc 'Use UPNP'
@@ -136,7 +141,7 @@ command :client do |cmd|
           # pong
           chan  = cfg[:channel]
           event = cfg[:event]
-          ip = global_options[:upnp] ? upnp() : eat('http://ifconfig.me/ip', :timeout => 60)
+          ip = global_options[:upnp] ? upnp() : eat('http://ifconfig.me/ip', :timeout => global_options[:timeout] )
           pong = {
             :id => @config[:myid],
             :ip => ip.strip,
